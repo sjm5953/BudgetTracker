@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forecast • Budget Tracker</title>
+
+    <!--tailwind and Daisy-->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <!--fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Lexend:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--icons-->
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
+    />
+
+    <style type="text/tailwindcss">
+      @theme {
+        --font-lexend: "Lexend";
+        --font-calsans: "Cal Sans";
+
+        /* your custom accent (tailwind token) */
+        --color-ghostgreen: #3aa37a; /* fallback value; override in your real theme */
+      }
+
+      html,
+      body {
+        font-family: var(--font-lexend), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+      .title-font {
+        font-family: var(--font-calsans), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+
+      /* utility-ish helpers using your ghostgreen */
+      .gg-bg {
+        background: var(--color-ghostgreen);
+      }
+      .gg-text {
+        color: var(--color-ghostgreen);
+      }
+      .gg-ring {
+        outline: 2px solid
+          color-mix(in oklab, var(--color-ghostgreen) 55%, transparent);
+        outline-offset: 2px;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+
+  <body class="bg-base-200">
+    <div class="min-h-dvh">
+      <!-- Header -->
+      <header
+        class="sticky top-0 z-50 bg-base-100/90 backdrop-blur border-b border-base-300"
+      >
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+          <button
+            class="btn btn-ghost btn-sm btn-circle"
+            aria-label="Back"
+            onclick="history.back()"
+            type="button"
+          >
+            <i class="fi fi-rr-angle-small-left text-base"></i>
+          </button>
+
+          <div class="flex items-center gap-3 flex-1">
+            <div
+              class="w-10 h-10 rounded-2xl bg-base-200 grid place-items-center"
+            >
+              <i class="fi fi-sr-chart-line-up gg-text text-lg"></i>
+            </div>
+            <div class="leading-tight">
+              <div class="title-font text-lg">Forecast</div>
+              <div class="text-xs opacity-70">
+                See your projected balance by date
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-ghost btn-sm btn-circle" aria-label="Filters">
+            <i class="fi fi-rr-filter text-base"></i>
+          </button>
+        </div>
+
+        <!-- Range chips -->
+        <div class="max-w-md mx-auto px-4 pb-3">
+          <div id="rangeChips" class="flex gap-2 overflow-x-auto no-scrollbar">
+            <button
+              class="btn btn-sm rounded-full border-base-300 bg-base-200"
+              data-range="7"
+              type="button"
+            >
+              7 days
+            </button>
+            <button
+              class="btn btn-sm rounded-full border-base-300 bg-base-200"
+              data-range="14"
+              type="button"
+            >
+              14 days
+            </button>
+            <button
+              class="btn btn-sm rounded-full border-base-300 bg-base-200"
+              data-range="30"
+              type="button"
+            >
+              30 days
+            </button>
+            <button
+              class="btn btn-sm rounded-full border-base-300 bg-base-200"
+              data-range="90"
+              type="button"
+            >
+              90 days
+            </button>
+            <button
+              class="btn btn-sm rounded-full border-base-300 bg-base-200"
+              data-range="custom"
+              type="button"
+            >
+              Custom
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-md mx-auto px-4 pt-4 pb-24 space-y-4">
+        <!-- Snapshot card -->
+        <section class="card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="text-xs uppercase tracking-wide opacity-70">
+                  Starting balance
+                </div>
+                <div class="title-font text-3xl mt-1">
+                  <span id="startBalance">$—</span>
+                </div>
+                <div class="text-xs opacity-70 mt-1">
+                  As of <span class="font-medium">Today</span>
+                </div>
+              </div>
+
+              <div class="text-right">
+                <div class="text-xs uppercase tracking-wide opacity-70">
+                  End of range
+                </div>
+                <div class="title-font text-3xl mt-1">
+                  <span id="endBalance">$—</span>
+                </div>
+                <div class="text-xs opacity-70 mt-1">
+                  In <span id="rangeLabel" class="font-medium">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider my-3"></div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <div class="p-3 rounded-2xl bg-base-200 border border-base-300">
+                <div class="text-xs opacity-70">Income</div>
+                <div class="font-semibold gg-text">
+                  <span id="rangeIncome">$—</span>
+                </div>
+              </div>
+              <div class="p-3 rounded-2xl bg-base-200 border border-base-300">
+                <div class="text-xs opacity-70">Bills</div>
+                <div class="font-semibold text-error">
+                  <span id="rangeBills">$—</span>
+                </div>
+              </div>
+              <div class="p-3 rounded-2xl bg-base-200 border border-base-300">
+                <div class="text-xs opacity-70">Net</div>
+                <div class="font-semibold text-error">
+                  <span id="rangeBills">$—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Balance on specific date -->
+        <section class="card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold">Balance on a date</div>
+                <div class="text-xs opacity-70">
+                  Jump to any day and see the projected balance.
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+              <input
+                id="jumpDate"
+                type="date"
+                class="input input-bordered w-full rounded-2xl"
+              />
+              <button
+                id="btnJump"
+                class="btn rounded-2xl text-base-100"
+                style="background: var(--color-ghostgreen)"
+                type="button"
+              >
+                Go
+              </button>
+            </div>
+
+            <div
+              class="mt-3 p-3 rounded-2xl bg-base-200 border border-base-300"
+            >
+              <div class="text-xs uppercase tracking-wide opacity-70">
+                Projected balance
+              </div>
+              <div class="title-font text-2xl mt-1">
+                <span id="jumpBalance">$—</span>
+              </div>
+              <div class="text-xs opacity-70 mt-1">
+                Includes recurring paydays/bills and any scheduled transactions.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Simple "chart" (sparkline-ish list) -->
+        <section class="card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold">Daily balance</div>
+                <div class="text-xs opacity-70">
+                  Tap a row to see what changed.
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm rounded-full" type="button">
+                Export <i class="fi fi-rr-download mt-[2px]"></i>
+              </button>
+            </div>
+
+            <div id="dailyList" class="mt-3 space-y-2"></div>
+
+            <div class="mt-3 text-xs opacity-70">
+              This list is your “chart” for v1. Later you can swap it for a real
+              line chart without changing the data model.
+            </div>
+          </div>
+        </section>
+
+        <!-- Upcoming events in range -->
+        <section>
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-sm font-semibold">Events in range</div>
+              <div class="text-xs opacity-70">
+                Paydays, bills, and planned spending
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm rounded-full" type="button">
+              Filters <i class="fi fi-rr-angle-small-right mt-[2px]"></i>
+            </button>
+          </div>
+
+          <div id="eventsList" class="space-y-2"></div>
+        </section>
+      </main>
+
+      <!-- Bottom nav (matching) -->
+      <nav
+        class="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-300"
+      >
+        <div class="max-w-md mx-auto px-3 py-2">
+          <div class="grid grid-cols-3 gap-2">
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-sr-home text-lg"></i>
+              <span class="text-[11px] -mt-1">Home</span>
+            </a>
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-rr-receipt text-lg"></i>
+              <span class="text-[11px] -mt-1">Activity</span>
+            </a>
+
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-rr-chart-line-up text-lg"></i>
+              <span class="text-[11px] -mt-1">Forecast</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div
+      id="authModal"
+      class="fixed inset-0 z-[9999] hidden bg-black/40 backdrop-blur-sm"
+    >
+      <div class="min-h-dvh grid place-items-center px-4">
+        <div
+          class="card bg-base-100 w-full max-w-sm shadow-xl border border-base-300"
+        >
+          <div class="card-body">
+            <h2 class="title-font text-xl">Sign in</h2>
+            <p class="text-sm opacity-70">Sign in to access your budget.</p>
+
+            <input
+              id="authEmail"
+              type="email"
+              placeholder="you@email.com"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <input
+              id="authPassword"
+              type="password"
+              placeholder="Password"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <button id="btnLogin" class="btn btn-primary rounded-2xl w-full">
+              Sign in / Create account
+            </button>
+
+            <div class="divider text-xs opacity-60">or</div>
+
+            <button id="btnMagic" class="btn btn-outline rounded-2xl w-full">
+              Email me a magic link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      // =========================
+      // Supabase config (SAFE singleton)
+      // =========================
+      const SUPABASE_URL = "https://dpjjwfdxmhmiucvxrhtj.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "sb_publishable_iLopQTJRLDf9Qtex0X5ynw_Sp7OWCd4";
+
+      window._supabaseClient =
+        window._supabaseClient ||
+        window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const sb = window._supabaseClient;
+
+      // TEMP v0
+      const ACCOUNT_ID = "441f6417-efa5-4047-89dd-02f259ecffea";
+
+      const $ = (id) => document.getElementById(id);
+      const setText = (id, value) => {
+        const el = $(id);
+        if (el) el.textContent = value;
+      };
+
+      // =========================
+      // State
+      // =========================
+      const state = {
+        rangeDays: 90, // default
+        startISO: null,
+        endISO: null,
+      };
+
+      // =========================
+      // Auth
+      // =========================
+      function showAuthModal() {
+        $("authModal")?.classList.remove("hidden");
+      }
+      function hideAuthModal() {
+        $("authModal")?.classList.add("hidden");
+      }
+
+      async function ensureAuth() {
+        const { data } = await sb.auth.getSession();
+        if (!data?.session) showAuthModal();
+        else hideAuthModal();
+        return data?.session || null;
+      }
+
+      async function handleLogin() {
+        const email = $("authEmail")?.value?.trim();
+        const password = $("authPassword")?.value;
+        if (!email || !password) return;
+
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (!error) return location.reload();
+
+        const { error: signUpError } = await sb.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) alert(signUpError.message);
+        else location.reload();
+      }
+
+      async function handleMagicLink() {
+        const email = $("authEmail")?.value?.trim();
+        if (!email) return;
+
+        const { error } = await sb.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: location.href },
+        });
+
+        if (error) alert(error.message);
+        else alert("Check your email for the sign-in link.");
+      }
+
+      // =========================
+      // Helpers
+      // =========================
+      function isoDate(d) {
+        return d.toISOString().slice(0, 10);
+      }
+
+      function addDaysISO(baseISO, days) {
+        const d = new Date(baseISO + "T00:00:00");
+        d.setDate(d.getDate() + days);
+        return isoDate(d);
+      }
+
+      function fmtMoney(n) {
+        const num = Number(n);
+        if (!Number.isFinite(num)) return "$—";
+        return num.toLocaleString(undefined, {
+          style: "currency",
+          currency: "USD",
+        });
+      }
+
+      function fmtDayLabel(dateStr) {
+        const d = new Date(dateStr + "T00:00:00");
+        const weekday = d.toLocaleDateString(undefined, { weekday: "short" });
+        const monthDay = d.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
+        return `${weekday} • ${monthDay}`;
+      }
+
+      function setActiveRangeButton(value) {
+        const wrap = $("rangeChips");
+        if (!wrap) return;
+
+        wrap.querySelectorAll("[data-range]").forEach((btn) => {
+          const isActive = btn.dataset.range === String(value);
+          btn.classList.toggle("text-base-100", isActive);
+
+          if (isActive) {
+            btn.style.background = "var(--color-ghostgreen)";
+          } else {
+            btn.style.background = "";
+          }
+        });
+      }
+
+      function setRange(days) {
+        state.rangeDays = days;
+        state.startISO = isoDate(new Date());
+        state.endISO = addDaysISO(state.startISO, days);
+      }
+
+      // =========================
+      // RPC wrappers
+      // =========================
+      async function getBalanceOn(dateISO) {
+        const { data, error } = await sb.rpc("get_balance_on_date", {
+          p_account_id: ACCOUNT_ID,
+          p_date: dateISO,
+        });
+        if (error) throw error;
+        return data; // numeric
+      }
+
+      async function getEventsBetween(startISO, endISO) {
+        const { data, error } = await sb.rpc("get_events", {
+          p_account_id: ACCOUNT_ID,
+          p_start: startISO,
+          p_end: endISO,
+        });
+        if (error) throw error;
+        return data || [];
+      }
+
+      // =========================
+      // Render: Events list
+      // =========================
+      function iconForEvent(ev) {
+        const amt = Number(ev.amount);
+        const isIncome = amt > 0;
+
+        if (ev.source === "transaction") {
+          return {
+            wrap: "bg-warning/15",
+            icon: "fi fi-sr-shopping-cart",
+            iconColor: "text-warning",
+            type: "Transaction",
+          };
+        }
+
+        // recurring
+        if (isIncome) {
+          return {
+            wrap: "",
+            icon: "fi fi-sr-coins",
+            iconColor: "gg-text",
+            type: "Income",
+            ghostMix: true,
+          };
+        }
+
+        return {
+          wrap: "bg-error/15",
+          icon: "fi fi-sr-home",
+          iconColor: "text-error",
+          type: "Bill",
+        };
+      }
+
+      function renderEventsInRange(events) {
+        const list = $("eventsList");
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        if (!events.length) {
+          list.innerHTML = `
+        <div class="p-6 rounded-2xl border border-dashed border-base-300 text-center bg-base-100">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-base-200 grid place-items-center mb-2">
+            <i class="fi fi-rr-calendar text-lg opacity-70"></i>
+          </div>
+          <div class="font-semibold">No events in this range</div>
+          <div class="text-sm opacity-70 mt-1">
+            Try a longer range or add a recurring item.
+          </div>
+          <div class="mt-3">
+            <a class="btn btn-ghost rounded-2xl" href="add.html">Add something</a>
+          </div>
+        </div>
+      `;
+          return;
+        }
+
+        for (const ev of events) {
+          const amt = Number(ev.amount);
+          const isIncome = amt > 0;
+
+          const sign = isIncome ? "+" : "-";
+          const moneyLine = `${sign} ${fmtMoney(Math.abs(amt))}`;
+
+          const meta =
+            ev.source === "transaction" ? "Transaction" : "Recurring";
+          const dateLine =
+            ev.source === "transaction"
+              ? `${meta} • ${fmtDayLabel(ev.event_date)}`
+              : `${fmtDayLabel(ev.event_date)} • ${meta}`;
+
+          const iconMeta = iconForEvent(ev);
+
+          let iconWrap = iconMeta.wrap;
+          let iconStyle = "";
+          if (iconMeta.ghostMix) {
+            iconStyle = `
+          background: color-mix(in oklab, var(--color-ghostgreen) 18%, transparent);
+        `;
+          }
+
+          const amountClass =
+            ev.source === "recurring"
+              ? isIncome
+                ? "gg-text"
+                : "text-error"
+              : "";
+
+          const card = document.createElement("div");
+          card.className = "card bg-base-100 border border-base-300 shadow-sm";
+          card.innerHTML = `
+        <div class="card-body p-3">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl grid place-items-center ${iconWrap}" style="${iconStyle}">
+                <i class="${iconMeta.icon} ${iconMeta.iconColor} text-base"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-semibold truncate">${ev.name ?? "Event"}</div>
+                <div class="text-xs opacity-70">${dateLine}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-semibold ${amountClass}">${moneyLine}</div>
+              <div class="text-xs opacity-60">${iconMeta.type}</div>
+            </div>
+          </div>
+        </div>
+      `;
+          list.appendChild(card);
+        }
+      }
+
+      // =========================
+      // Render: Daily balance list ("chart")
+      // =========================
+      function renderDailyList(dailyRows) {
+        const list = $("dailyList");
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        if (!dailyRows.length) {
+          list.innerHTML = `
+        <div class="p-4 rounded-2xl bg-base-200 border border-base-300 text-sm opacity-70">
+          No days to show.
+        </div>
+      `;
+          return;
+        }
+
+        const values = dailyRows
+          .map((r) => Number(r.balance))
+          .filter(Number.isFinite);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const span = max - min || 1;
+
+        for (const row of dailyRows) {
+          const bal = Number(row.balance);
+          const delta = Number(row.delta || 0);
+          const label = fmtDayLabel(row.date);
+          const pct = Math.max(0, Math.min(100, ((bal - min) / span) * 100));
+
+          const deltaLabel =
+            delta === 0
+              ? "—"
+              : `${delta > 0 ? "+" : "-"} ${fmtMoney(Math.abs(delta))}`;
+
+          const deltaClass =
+            delta > 0 ? "gg-text" : delta < 0 ? "text-error" : "opacity-70";
+
+          const note = row.note || (delta === 0 ? "No events" : "Changed");
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className =
+            "w-full text-left p-3 rounded-2xl bg-base-200 border border-base-300 active:scale-[0.99] transition";
+          btn.innerHTML = `
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="text-sm font-semibold">${label}</div>
+            <div class="text-xs opacity-70">${note}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-semibold">${fmtMoney(bal)}</div>
+            <div class="text-xs ${deltaClass}">${deltaLabel}</div>
+          </div>
+        </div>
+        <div class="mt-2 h-2 rounded-full bg-base-100 border border-base-300 overflow-hidden">
+          <div class="h-full" style="width:${pct}%; background: var(--color-ghostgreen)"></div>
+        </div>
+      `;
+          list.appendChild(btn);
+        }
+      }
+
+      // =========================
+      // Load + compute everything for selected range
+      // =========================
+      async function loadForecastRange() {
+        // Snapshot
+        const startBal = await getBalanceOn(state.startISO);
+        const endBal = await getBalanceOn(state.endISO);
+
+        setText("startBalance", fmtMoney(startBal));
+        setText("endBalance", fmtMoney(endBal));
+        setText(
+          "rangeLabel",
+          state.rangeDays === 1 ? "1 day" : `${state.rangeDays} days`
+        );
+
+        // Events in range
+        const events = await getEventsBetween(state.startISO, state.endISO);
+        events.sort((a, b) => (a.event_date > b.event_date ? 1 : -1));
+        renderEventsInRange(events);
+
+        // Income/Bills/Net (based on events)
+        const income = events
+          .filter((e) => Number(e.amount) > 0)
+          .reduce((s, e) => s + Number(e.amount), 0);
+
+        const bills = events
+          .filter((e) => Number(e.amount) < 0)
+          .reduce((s, e) => s + Number(e.amount), 0); // negative
+
+        const net = income + bills;
+
+        setText("rangeIncome", `+ ${fmtMoney(income)}`);
+        setText("rangeBills", `- ${fmtMoney(Math.abs(bills))}`);
+        setText(
+          "rangeNet",
+          net >= 0 ? `+ ${fmtMoney(net)}` : `- ${fmtMoney(Math.abs(net))}`
+        );
+
+        // Daily list: v1 version = only days with events + start + end
+        const daily = [];
+        daily.push({
+          date: state.startISO,
+          balance: startBal,
+          delta: 0,
+          note: "Start",
+        });
+
+        let running = startBal;
+        let lastDate = state.startISO;
+
+        const byDate = new Map();
+        for (const ev of events) {
+          const d = ev.event_date;
+          if (!byDate.has(d)) byDate.set(d, []);
+          byDate.get(d).push(ev);
+        }
+
+        const dates = Array.from(byDate.keys()).sort();
+
+        for (const d of dates) {
+          const dayEvents = byDate.get(d);
+          const delta = dayEvents.reduce((s, e) => s + Number(e.amount), 0);
+          running += delta;
+
+          const topName = dayEvents[0]?.name || "Events";
+          const note =
+            dayEvents.length === 1
+              ? `${topName}`
+              : `${topName} +${dayEvents.length - 1} more`;
+
+          daily.push({ date: d, balance: running, delta, note });
+          lastDate = d;
+        }
+
+        if (lastDate !== state.endISO) {
+          daily.push({
+            date: state.endISO,
+            balance: endBal,
+            delta: 0,
+            note: "End",
+          });
+        }
+
+        renderDailyList(daily);
+      }
+
+      // =========================
+      // Jump-to-date balance
+      // =========================
+      async function updateJumpBalance() {
+        const input = $("jumpDate");
+        const out = $("jumpBalance");
+        if (!input || !out) return;
+
+        if (!input.value) {
+          out.textContent = "$—";
+          return;
+        }
+
+        out.textContent = "…";
+        try {
+          const bal = await getBalanceOn(input.value);
+          out.textContent = fmtMoney(bal);
+        } catch (e) {
+          console.error(e);
+          out.textContent = "$—";
+        }
+      }
+
+      // =========================
+      // Custom range (simple prompt v1)
+      // =========================
+      async function chooseCustomRange() {
+        const daysStr = prompt("Custom range: how many days?");
+        if (!daysStr) return;
+        const days = Number(daysStr);
+        if (!Number.isFinite(days) || days <= 0)
+          return alert("Enter a valid number");
+
+        setRange(Math.min(365, Math.floor(days)));
+        setActiveRangeButton("custom");
+        $("rangeLabel").textContent = `${state.rangeDays} days`;
+        await loadForecastRange();
+      }
+
+      // =========================
+      // Init
+      // =========================
+      let _initRan = false;
+
+      async function initForecast() {
+        if (_initRan) return;
+        _initRan = true;
+
+        const session = await ensureAuth();
+        if (!session) return;
+
+        // Default range
+        setRange(90);
+        setActiveRangeButton("90");
+
+        // default jump date to end of range
+        if ($("jumpDate") && !$("jumpDate").value)
+          $("jumpDate").value = state.endISO;
+
+        await loadForecastRange();
+        await updateJumpBalance();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Auth wiring
+        $("btnLogin")?.addEventListener("click", handleLogin);
+        $("btnMagic")?.addEventListener("click", handleMagicLink);
+
+        // Range chips
+        $("rangeChips")?.addEventListener("click", async (e) => {
+          const btn = e.target.closest("[data-range]");
+          if (!btn) return;
+
+          const r = btn.dataset.range;
+          if (r === "custom") return chooseCustomRange();
+
+          const days = Number(r);
+          if (!Number.isFinite(days)) return;
+
+          setRange(days);
+          setActiveRangeButton(String(days));
+
+          // keep jump date inside range by default: set to end
+          if ($("jumpDate")) $("jumpDate").value = state.endISO;
+
+          await loadForecastRange();
+          await updateJumpBalance();
+        });
+
+        // Jump-to-date
+        $("btnJump")?.addEventListener("click", updateJumpBalance);
+        $("jumpDate")?.addEventListener("change", updateJumpBalance);
+
+        initForecast();
+
+        sb.auth.onAuthStateChange((_event, session) => {
+          session ? hideAuthModal() : showAuthModal();
+          if (session) {
+            _initRan = false;
+            initForecast();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

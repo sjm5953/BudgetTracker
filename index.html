@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget Tracker</title>
+
+    <!--tailwind and Daisy-->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <!--fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Lexend:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--icons-->
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
+    />
+
+    <style type="text/tailwindcss">
+      @theme {
+        --font-lexend: "Lexend";
+        --font-calsans: "Cal Sans";
+        --color-ghostgreen: #84a98c;
+      }
+      html,
+      body {
+        font-family: var(--font-lexend), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+      .title-font {
+        font-family: var(--font-calsans), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-base-200">
+    <!-- App shell -->
+    <div class="min-h-dvh">
+      <!-- Top header -->
+      <header
+        class="sticky top-0 z-50 bg-base-100/90 backdrop-blur border-b border-base-300"
+      >
+        <div
+          class="max-w-md mx-auto px-4 py-3 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-1">
+            <div
+              class="w-10 h-10 rounded-2xl bg-ghost/15 grid place-items-center"
+            >
+              <i class="fi fi-sr-ghost text-ghostgreen text-xl pt-1"></i>
+            </div>
+            <div class="leading-tight">
+              <div class="title-font text-lg">Ghost Wallet</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button class="btn btn-ghost btn-sm btn-circle" aria-label="Search">
+              <i class="fi fi-rr-search text-base"></i>
+            </button>
+            <button
+              class="btn btn-ghost btn-sm btn-circle"
+              aria-label="Settings"
+            >
+              <i class="fi fi-rr-settings text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick forecast chips -->
+        <div class="max-w-md mx-auto px-4 pb-3">
+          <div class="flex gap-2 overflow-x-auto no-scrollbar">
+            <button class="btn btn-sm rounded-full bg-base-200 border-base-300">
+              In 7d: <span id="chip7" class="font-semibold">$—</span>
+            </button>
+
+            <button class="btn btn-sm rounded-full bg-base-200 border-base-300">
+              In 14d: <span id="chip14" class="font-semibold">$—</span>
+            </button>
+
+            <button class="btn btn-sm rounded-full bg-base-200 border-base-300">
+              In 30d: <span id="chip30" class="font-semibold">$—</span>
+            </button>
+
+            <button class="btn btn-sm rounded-full bg-base-200 border-base-300">
+              In 90d: <span id="chip90" class="font-semibold">$—</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="max-w-md mx-auto px-4 pt-4 pb-28">
+        <!-- Balance card -->
+        <section class="card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="text-xs uppercase tracking-wide opacity-70">
+                  Balance as of today
+                </div>
+                <div
+                  id="balanceToday"
+                  class="title-font text-4xl leading-tight mt-1"
+                >
+                  $—
+                </div>
+                <div class="text-sm mt-2 opacity-80">
+                  Last updated <span class="font-medium">Today</span> •
+                  <span class="link link-hover">Reconcile</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col items-end gap-2">
+                <div class="stat p-0">
+                  <div class="stat-title text-xs opacity-70">
+                    Net next 30 days
+                  </div>
+                  <div class="stat-value text-lg">+$312</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider my-3"></div>
+
+            <!-- ghost actions -->
+            <div class="grid grid-cols-2 gap-2">
+              <a
+                class="btn btn-ghost bg-ghostgreen text-white rounded-2xl"
+                href="add.html"
+              >
+                <i class="fi fi-sr-plus text-base text-xs pt-1"></i>
+                Add transaction
+              </a>
+              <a
+                class="btn btn-outline border-ghostgreen rounded-2xl"
+                href="/add.html"
+              >
+                <i class="fi fi-rr-calendar-clock text-base pt-1"></i>
+                Add recurring
+              </a>
+            </div>
+
+            <!-- Secondary actions -->
+            <div class="grid grid-cols-3 gap-2 mt-2">
+              <a class="btn btn-ghost rounded-2xl" href="#">
+                <i class="fi fi-rr-chart-line-up text-base pt-1"></i>
+                Forecast
+              </a>
+              <a class="btn btn-ghost rounded-2xl" href="#">
+                <i class="fi fi-rr-receipt text-base pt-1"></i>
+                Transactions
+              </a>
+              <a class="btn btn-ghost rounded-2xl" href="#">
+                <i class="fi fi-rr-list-check text-base pt-1"></i>
+                Bills
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Balance on date -->
+        <section class="mt-4 card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold">Balance on a date</div>
+                <div class="text-xs opacity-70">
+                  Pick a future date to see your projected balance.
+                </div>
+              </div>
+              <i class="fi fi-rr-angle-small-right text-lg opacity-70"></i>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+              <input
+                id="checkDate"
+                type="date"
+                class="input input-bordered w-full rounded-2xl"
+                value=""
+              />
+              <button
+                id="btnCheckDate"
+                class="btn btn-ghost bg-ghostgreen text-white rounded-2xl whitespace-nowrap"
+              >
+                Check
+              </button>
+            </div>
+
+            <div
+              class="mt-3 p-3 rounded-2xl bg-base-200 border border-base-300"
+            >
+              <div class="text-xs uppercase tracking-wide opacity-70">
+                Projected balance
+              </div>
+              <div id="projectedBalance" class="title-font text-2xl mt-1">
+                $—
+              </div>
+              <div class="text-xs opacity-70 mt-1">
+                Includes upcoming paydays + recurring bills (and any scheduled
+                transactions).
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Upcoming events list -->
+        <section class="mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="text-sm font-semibold">Upcoming</div>
+              <div class="text-xs opacity-70">Next 10 events</div>
+            </div>
+            <a class="btn btn-ghost btn-sm rounded-full" href="#">
+              View all <i class="fi fi-rr-angle-small-right mt-[2px]"></i>
+            </a>
+          </div>
+
+          <div id="upcomingList" class="space-y-2"></div>
+        </section>
+      </main>
+
+      <!-- Bottom nav -->
+      <nav
+        class="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-300"
+      >
+        <div class="max-w-md mx-auto px-3 py-2">
+          <div class="grid grid-cols-3 gap-2">
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-sr-home text-lg"></i>
+              <span class="text-[11px] -mt-1">Home</span>
+            </a>
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-rr-receipt text-lg"></i>
+              <span class="text-[11px] -mt-1">Activity</span>
+            </a>
+
+            <a class="btn btn-ghost rounded-2xl flex flex-col h-14" href="#">
+              <i class="fi fi-rr-chart-line-up text-lg"></i>
+              <span class="text-[11px] -mt-1">Forecast</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div
+      id="authModal"
+      class="fixed inset-0 z-[9999] hidden bg-black/40 backdrop-blur-sm"
+    >
+      <div class="min-h-dvh grid place-items-center px-4">
+        <div
+          class="card bg-base-100 w-full max-w-sm shadow-xl border border-base-300"
+        >
+          <div class="card-body">
+            <h2 class="title-font text-xl">Sign in</h2>
+            <p class="text-sm opacity-70">Sign in to access your budget.</p>
+
+            <input
+              id="authEmail"
+              type="email"
+              placeholder="you@email.com"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <input
+              id="authPassword"
+              type="password"
+              placeholder="Password"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <button id="btnLogin" class="btn btn-primary rounded-2xl w-full">
+              Sign in / Create account
+            </button>
+
+            <div class="divider text-xs opacity-60">or</div>
+
+            <button id="btnMagic" class="btn btn-outline rounded-2xl w-full">
+              Email me a magic link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      /* optional: hide horizontal scrollbar for chip row */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      // =========================
+      // Supabase config (safe singleton)
+      // =========================
+      const SUPABASE_URL = "https://dpjjwfdxmhmiucvxrhtj.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "sb_publishable_iLopQTJRLDf9Qtex0X5ynw_Sp7OWCd4";
+
+      window._supabaseClient =
+        window._supabaseClient ||
+        window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const sb = window._supabaseClient;
+
+      // TEMP v0 (keep until you auto-pick accounts)
+      const ACCOUNT_ID = "441f6417-efa5-4047-89dd-02f259ecffea";
+
+      const $ = (id) => document.getElementById(id);
+
+      // =========================
+      // Auth modal
+      // =========================
+      function showAuthModal() {
+        $("authModal")?.classList.remove("hidden");
+      }
+      function hideAuthModal() {
+        $("authModal")?.classList.add("hidden");
+      }
+
+      async function ensureAuth() {
+        const { data, error } = await sb.auth.getSession();
+        if (error) console.error("getSession error:", error);
+
+        if (!data?.session) showAuthModal();
+        else hideAuthModal();
+
+        return data?.session || null;
+      }
+
+      async function handleLogin() {
+        const email = $("authEmail")?.value?.trim();
+        const password = $("authPassword")?.value;
+        if (!email || !password) return;
+
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (!error) return location.reload();
+
+        const { error: signUpError } = await sb.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) alert(signUpError.message);
+        else location.reload();
+      }
+
+      async function handleMagicLink() {
+        const email = $("authEmail")?.value?.trim();
+        if (!email) return;
+
+        const { error } = await sb.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: location.href },
+        });
+
+        if (error) alert(error.message);
+        else alert("Check your email for the sign-in link.");
+      }
+
+      // =========================
+      // Formatting helpers
+      // =========================
+      function isoDate(d) {
+        return d.toISOString().slice(0, 10);
+      }
+
+      function addDaysISO(days) {
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        return isoDate(d);
+      }
+
+      function fmtMoney(n) {
+        const num = Number(n);
+        if (!Number.isFinite(num)) return "$—";
+        return num.toLocaleString(undefined, {
+          style: "currency",
+          currency: "USD",
+        });
+      }
+
+      function fmtDayLabel(dateStr) {
+        const d = new Date(dateStr + "T00:00:00");
+        const weekday = d.toLocaleDateString(undefined, { weekday: "short" });
+        const monthDay = d.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
+        return `${weekday} • ${monthDay}`;
+      }
+
+      // =========================
+      // Data: balances
+      // =========================
+      async function getBalanceOn(dateISO) {
+        const { data, error } = await sb.rpc("get_balance_on_date", {
+          p_account_id: ACCOUNT_ID,
+          p_date: dateISO,
+        });
+        if (error) throw error;
+        return data;
+      }
+
+      async function loadBalanceToday() {
+        const el = $("balanceToday");
+        if (!el) return;
+
+        try {
+          const today = isoDate(new Date());
+          el.textContent = fmtMoney(await getBalanceOn(today));
+        } catch (e) {
+          console.error("loadBalanceToday:", e);
+          el.textContent = "$—";
+        }
+      }
+
+      async function loadForecastChips() {
+        const chips = [
+          { days: 7, el: $("chip7") },
+          { days: 14, el: $("chip14") },
+          { days: 30, el: $("chip30") },
+          { days: 90, el: $("chip90") },
+        ];
+
+        await Promise.all(
+          chips.map(async ({ days, el }) => {
+            if (!el) return;
+            try {
+              const d = addDaysISO(days);
+              el.textContent = fmtMoney(await getBalanceOn(d));
+            } catch (e) {
+              console.error(`chip ${days}d:`, e);
+              el.textContent = "$—";
+            }
+          })
+        );
+      }
+
+      // =========================
+      // Balance on a date (picker)
+      // =========================
+      async function handleCheckDate() {
+        const input = $("checkDate");
+        const out = $("projectedBalance");
+        if (!input || !out) return;
+
+        const dateISO = input.value;
+        if (!dateISO) {
+          out.textContent = "$—";
+          return;
+        }
+
+        out.textContent = "…";
+
+        try {
+          const bal = await getBalanceOn(dateISO);
+          out.textContent = fmtMoney(bal);
+        } catch (e) {
+          console.error("handleCheckDate:", e);
+          out.textContent = "$—";
+        }
+      }
+
+      // =========================
+      // Upcoming events list
+      // =========================
+      function iconForEvent(ev) {
+        const amt = Number(ev.amount);
+        const isIncome = amt > 0;
+
+        if (ev.source === "transaction") {
+          return {
+            wrap: "bg-warning/15",
+            icon: "fi fi-sr-shopping-cart",
+            iconColor: "text-warning",
+          };
+        }
+
+        if (isIncome) {
+          return {
+            wrap: "bg-success/15",
+            icon: "fi fi-sr-coins",
+            iconColor: "text-success",
+          };
+        }
+
+        return {
+          wrap: "bg-error/15",
+          icon: "fi fi-sr-home",
+          iconColor: "text-error",
+        };
+      }
+
+      function renderUpcoming(events) {
+        const list = $("upcomingList");
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        if (!events || events.length === 0) {
+          list.innerHTML = `
+        <div class="p-6 rounded-2xl border border-dashed border-base-300 text-center bg-base-100">
+          <div class="w-12 h-12 mx-auto rounded-2xl bg-base-200 grid place-items-center mb-2">
+            <i class="fi fi-rr-calendar text-lg opacity-70"></i>
+          </div>
+          <div class="font-semibold">No upcoming events yet</div>
+          <div class="text-sm opacity-70 mt-1">
+            Add a payday or a recurring bill to start forecasting.
+          </div>
+          <div class="mt-3">
+            <a class="btn btn-ghost rounded-2xl" href="add.html">Add recurring</a>
+          </div>
+        </div>
+      `;
+          return;
+        }
+
+        for (const ev of events) {
+          const amt = Number(ev.amount);
+          const isIncome = amt > 0;
+          const money = fmtMoney(Math.abs(amt));
+          const sign = isIncome ? "+" : "-";
+          const moneyLine = `${sign} ${money}`;
+
+          const meta =
+            ev.source === "transaction" ? "Transaction" : "Recurring";
+          const dateLine = fmtDayLabel(ev.event_date);
+          const iconMeta = iconForEvent(ev);
+
+          const amountClass =
+            ev.source === "recurring"
+              ? isIncome
+                ? "text-success"
+                : "text-error"
+              : "";
+
+          const card = document.createElement("div");
+          card.className = "card bg-base-100 border border-base-300 shadow-sm";
+          card.innerHTML = `
+        <div class="card-body p-3">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl ${
+                iconMeta.wrap
+              } grid place-items-center">
+                <i class="${iconMeta.icon} ${iconMeta.iconColor} text-base"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-semibold truncate">${ev.name ?? "Event"}</div>
+                <div class="text-xs opacity-70">${dateLine}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-semibold ${amountClass}">${moneyLine}</div>
+              <div class="text-xs opacity-60">${meta}</div>
+            </div>
+          </div>
+        </div>
+      `;
+          list.appendChild(card);
+        }
+      }
+
+      async function loadUpcoming() {
+        try {
+          const start = isoDate(new Date());
+          const end = isoDate(new Date(Date.now() + 90 * 24 * 60 * 60 * 1000));
+
+          const { data, error } = await sb.rpc("get_events", {
+            p_account_id: ACCOUNT_ID,
+            p_start: start,
+            p_end: end,
+          });
+
+          if (error) throw error;
+
+          const sorted = (data || [])
+            .slice()
+            .sort((a, b) => (a.event_date > b.event_date ? 1 : -1))
+            .slice(0, 10);
+
+          renderUpcoming(sorted);
+        } catch (e) {
+          console.error("loadUpcoming:", e);
+          renderUpcoming([]);
+        }
+      }
+
+      // =========================
+      // Init
+      // =========================
+      async function initForecastPage() {
+        const session = await ensureAuth();
+        if (!session) return;
+
+        // default the date picker to +30 days
+        const check = $("checkDate");
+        if (check && !check.value) check.value = addDaysISO(30);
+
+        await loadBalanceToday();
+        await loadForecastChips();
+        await loadUpcoming();
+
+        // also compute the projected balance for the default picker value
+        await handleCheckDate();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        $("btnLogin")?.addEventListener("click", handleLogin);
+        $("btnMagic")?.addEventListener("click", handleMagicLink);
+
+        $("btnCheckDate")?.addEventListener("click", handleCheckDate);
+        $("checkDate")?.addEventListener("change", handleCheckDate);
+
+        initForecastPage();
+
+        sb.auth.onAuthStateChange((_event, session) => {
+          session ? hideAuthModal() : showAuthModal();
+          if (session) initForecastPage();
+        });
+      });
+    </script>
+  </body>
+</html>

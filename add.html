@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add • Budget Tracker</title>
+
+    <!--tailwind and Daisy-->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <!--fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Lexend:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--icons-->
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
+    />
+
+    <style type="text/tailwindcss">
+      @theme {
+        --font-lexend: "Lexend";
+        --font-calsans: "Cal Sans";
+        --color-ghostgreen: #84a98c;
+      }
+      html,
+      body {
+        font-family: var(--font-lexend), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+      .title-font {
+        font-family: var(--font-calsans), system-ui, -apple-system, Segoe UI,
+          Roboto, Arial, sans-serif;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+
+  <body class="bg-base-200">
+    <div class="min-h-dvh">
+      <!-- Header -->
+      <header
+        class="sticky top-0 z-50 bg-base-100/90 backdrop-blur border-b border-base-300"
+      >
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+          <button
+            class="btn btn-ghost btn-sm btn-circle"
+            aria-label="Back"
+            onclick="history.back()"
+            type="button"
+          >
+            <i class="fi fi-rr-angle-small-left text-base"></i>
+          </button>
+
+          <div class="flex items-center gap-3 flex-1">
+            <div class="leading-tight">
+              <div class="title-font text-lg">Add</div>
+              <div class="text-xs opacity-70">
+                Create a transaction or recurring
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-ghost btn-sm btn-circle" aria-label="Help">
+            <i class="fi fi-rr-interrogation text-base"></i>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="max-w-md mx-auto px-4 pb-3">
+          <div
+            class="tabs tabs-boxed bg-base-200 border border-base-300 rounded-2xl p-1"
+          >
+            <button
+              class="tab tab-active flex-1 rounded-xl"
+              type="button"
+              data-tab="tx"
+            >
+              Transaction
+            </button>
+            <button class="tab flex-1 rounded-xl" type="button" data-tab="rec">
+              Recurring
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-md mx-auto px-4 pt-4 pb-24">
+        <!-- TRANSACTION PANEL -->
+        <section id="panel-tx" class="space-y-3">
+          <!-- Amount -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold">Amount</div>
+                  <div class="text-xs opacity-70">
+                    Use negative for spending, positive for income.
+                  </div>
+                </div>
+                <div class="badge badge-outline">One-time</div>
+              </div>
+
+              <div class="mt-3 join w-full">
+                <label
+                  class="join-item btn btn-outline border-ghostgreen rounded-l-2xl"
+                  >USD</label
+                >
+                <input
+                  id="txAmount"
+                  class="join-item input input-bordered border-ghostgreen w-full rounded-r-2xl"
+                  inputmode="decimal"
+                  placeholder="-78.42"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4 space-y-3">
+              <div class="text-sm font-semibold">Details</div>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70">Date</span>
+                </div>
+                <input
+                  id="txDate"
+                  type="date"
+                  class="input input-bordered w-full rounded-2xl"
+                />
+              </label>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70">Category</span>
+                </div>
+                <select
+                  id="txCategory"
+                  class="select select-bordered w-full rounded-2xl"
+                >
+                  <option>Groceries</option>
+                  <option>Dining</option>
+                  <option>Gas</option>
+                  <option>Bills</option>
+                  <option>Shopping</option>
+                  <option>Entertainment</option>
+                  <option>Other</option>
+                </select>
+              </label>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70"
+                    >Merchant / Note</span
+                  >
+                </div>
+                <input
+                  id="txNote"
+                  class="input input-bordered w-full rounded-2xl"
+                  placeholder="Target, Publix, Netflix..."
+                />
+              </label>
+
+              <div
+                class="flex items-center justify-between p-3 rounded-2xl bg-base-200 border border-base-300"
+              >
+                <div>
+                  <div class="font-semibold text-sm">Cleared</div>
+                  <div class="text-xs opacity-70">
+                    Counts as “real” balance now.
+                  </div>
+                </div>
+                <input
+                  id="txCleared"
+                  type="checkbox"
+                  class="toggle checked:text-ghostgreen"
+                  checked
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Save bar -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4">
+              <button
+                id="btnSaveTx"
+                class="btn btn-ghost bg-ghostgreen text-white rounded-2xl w-full"
+                type="button"
+              >
+                <i class="fi fi-sr-disk text-base pt-1 text-sm"></i>
+                Save transaction
+              </button>
+
+              <button
+                class="btn btn-ghost rounded-2xl w-full mt-2"
+                type="button"
+                onclick="history.back()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RECURRING PANEL -->
+        <section id="panel-rec" class="space-y-3 hidden">
+          <!-- Type picker -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold">Recurring item</div>
+                  <div class="text-xs opacity-70">
+                    Payday or bill — same engine.
+                  </div>
+                </div>
+                <div class="badge badge-outline">Repeats</div>
+              </div>
+
+              <div class="join w-full">
+                <button
+                  class="btn join-item rounded-l-2xl bg-ghostgreen text-white border border-ghostgreen hover:opacity-90"
+                  type="button"
+                  data-rec-type="income"
+                >
+                  Payday
+                </button>
+                <button
+                  class="btn join-item rounded-r-2xl btn-outline border-ghostgreen text-ghostgreen hover:bg-ghostgreen hover:text-white"
+                  type="button"
+                  data-rec-type="expense"
+                >
+                  Bill
+                </button>
+              </div>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70">Name</span>
+                </div>
+                <input
+                  id="recName"
+                  class="input input-bordered w-full rounded-2xl"
+                  placeholder="Paycheck, Rent, Phone..."
+                />
+              </label>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70">Amount</span>
+                </div>
+                <div class="join w-full">
+                  <span
+                    class="join-item btn btn-outline border-ghostgreen rounded-l-2xl"
+                    >USD</span
+                  >
+                  <input
+                    id="recAmount"
+                    class="join-item input input-bordered border-ghostgreen w-full rounded-r-2xl"
+                    inputmode="decimal"
+                    placeholder="+1250.00 (or -1450.00)"
+                  />
+                </div>
+                <div class="text-xs opacity-70 mt-1">
+                  Tip: paydays are positive, bills are negative.
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Schedule -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4 space-y-3">
+              <div class="text-sm font-semibold">Schedule</div>
+
+              <label class="form-control w-full">
+                <div class="label pb-1">
+                  <span class="label-text text-xs opacity-70">Frequency</span>
+                </div>
+                <select
+                  id="freq"
+                  class="select select-bordered w-full rounded-2xl"
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Every 2 weeks</option>
+                  <option value="monthly" selected>Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </label>
+
+              <div class="grid grid-cols-2 gap-2">
+                <label class="form-control w-full">
+                  <div class="label pb-1">
+                    <span class="label-text text-xs opacity-70"
+                      >Start date</span
+                    >
+                  </div>
+                  <input
+                    id="recStartDate"
+                    type="date"
+                    class="input input-bordered w-full rounded-2xl"
+                  />
+                </label>
+
+                <label class="form-control w-full">
+                  <div class="label pb-1">
+                    <span class="label-text text-xs opacity-70"
+                      >Day of month</span
+                    >
+                  </div>
+                  <select
+                    id="dom"
+                    class="select select-bordered w-full rounded-2xl"
+                  >
+                    <option value="1">1</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="28">28</option>
+                    <option value="last">Last day</option>
+                  </select>
+                </label>
+              </div>
+
+              <div
+                class="flex items-center justify-between p-3 rounded-2xl bg-base-200 border border-base-300"
+              >
+                <div>
+                  <div class="font-semibold text-sm">Expected</div>
+                  <div class="text-xs opacity-70">
+                    Include in forecasts by default.
+                  </div>
+                </div>
+                <input
+                  id="recExpected"
+                  type="checkbox"
+                  class="toggle text-ghostgreen"
+                  checked
+                />
+              </div>
+
+              <div
+                class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-2xl"
+              >
+                <input type="checkbox" />
+                <div class="collapse-title text-sm font-semibold">
+                  Advanced options
+                </div>
+                <div class="collapse-content space-y-3">
+                  <label class="form-control w-full">
+                    <div class="label pb-1">
+                      <span class="label-text text-xs opacity-70"
+                        >End date (optional)</span
+                      >
+                    </div>
+                    <input
+                      id="recEndDate"
+                      type="date"
+                      class="input input-bordered w-full rounded-2xl"
+                    />
+                  </label>
+
+                  <label class="form-control w-full">
+                    <div class="label pb-1">
+                      <span class="label-text text-xs opacity-70"
+                        >Notes (optional)</span
+                      >
+                    </div>
+                    <input
+                      id="recNotes"
+                      class="input input-bordered w-full rounded-2xl"
+                      placeholder="Autopay, due date nuance, etc."
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save -->
+          <div class="card bg-base-100 shadow-sm border border-base-300">
+            <div class="card-body p-4">
+              <button
+                id="btnSaveRec"
+                class="btn btn-ghost bg-ghostgreen text-white rounded-2xl w-full"
+                type="button"
+              >
+                <i class="fi fi-sr-disk text-base"></i>
+                Save recurring
+              </button>
+
+              <button
+                class="btn btn-ghost rounded-2xl w-full mt-2"
+                type="button"
+                onclick="history.back()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Sticky bottom hint (optional) -->
+      <footer
+        class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300"
+      >
+        <div class="max-w-md mx-auto px-4 py-2 text-xs opacity-70">
+          Tip: Keep it simple — add recurring paydays/bills once, then log real
+          spending as you go.
+        </div>
+      </footer>
+    </div>
+    <div
+      id="authModal"
+      class="fixed inset-0 z-[9999] hidden bg-black/40 backdrop-blur-sm"
+    >
+      <div class="min-h-dvh grid place-items-center px-4">
+        <div
+          class="card bg-base-100 w-full max-w-sm shadow-xl border border-base-300"
+        >
+          <div class="card-body">
+            <h2 class="title-font text-xl">Sign in</h2>
+            <p class="text-sm opacity-70">Sign in to access your budget.</p>
+
+            <input
+              id="authEmail"
+              type="email"
+              placeholder="you@email.com"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <input
+              id="authPassword"
+              type="password"
+              placeholder="Password"
+              class="input input-bordered w-full rounded-2xl"
+            />
+
+            <button id="btnLogin" class="btn btn-primary rounded-2xl w-full">
+              Sign in / Create account
+            </button>
+
+            <div class="divider text-xs opacity-60">or</div>
+
+            <button id="btnMagic" class="btn btn-outline rounded-2xl w-full">
+              Email me a magic link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      // =========================
+      // Supabase config (safe singleton)
+      // =========================
+      const SUPABASE_URL = "https://dpjjwfdxmhmiucvxrhtj.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "sb_publishable_iLopQTJRLDf9Qtex0X5ynw_Sp7OWCd4";
+
+      window._supabaseClient =
+        window._supabaseClient ||
+        window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const sb = window._supabaseClient;
+
+      // TEMP v0
+      const ACCOUNT_ID = "441f6417-efa5-4047-89dd-02f259ecffea";
+
+      const $ = (id) => document.getElementById(id);
+
+      // =========================
+      // UI helpers
+      // =========================
+      function toast(msg, type = "info") {
+        const div = document.createElement("div");
+        div.className = "toast toast-top toast-center z-[9999] p-2";
+        div.innerHTML = `
+      <div class="alert alert-${type} shadow-lg rounded-2xl">
+        <span>${msg}</span>
+      </div>`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2200);
+      }
+
+      function parseMoney(str) {
+        if (!str) return NaN;
+        const cleaned = String(str).replace(/,/g, "").trim();
+        const num = Number(cleaned);
+        return Number.isFinite(num) ? num : NaN;
+      }
+
+      // =========================
+      // Auth
+      // =========================
+      function showAuthModal() {
+        $("authModal")?.classList.remove("hidden");
+      }
+      function hideAuthModal() {
+        $("authModal")?.classList.add("hidden");
+      }
+
+      async function ensureAuth() {
+        const { data, error } = await sb.auth.getSession();
+        if (error) {
+          console.error(error);
+          showAuthModal();
+          return;
+        }
+        if (!data?.session) showAuthModal();
+        else hideAuthModal();
+      }
+
+      async function requireUserId() {
+        const { data, error } = await sb.auth.getUser();
+        if (error) throw error;
+        if (!data?.user?.id) throw new Error("Not signed in");
+        return data.user.id;
+      }
+
+      async function handleLogin() {
+        const email = $("authEmail").value.trim();
+        const password = $("authPassword").value;
+        if (!email || !password) return;
+
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (!error) return location.reload();
+
+        const { error: signUpError } = await sb.auth.signUp({
+          email,
+          password,
+        });
+        if (signUpError) alert(signUpError.message);
+        else location.reload();
+      }
+
+      async function handleMagicLink() {
+        const email = $("authEmail").value.trim();
+        if (!email) return;
+
+        const { error } = await sb.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: location.href },
+        });
+
+        if (error) alert(error.message);
+        else alert("Check your email for the sign-in link.");
+      }
+
+      // =========================
+      // Save Transaction
+      // =========================
+      async function saveTransaction() {
+        try {
+          const user_id = await requireUserId();
+
+          const amount = parseMoney($("txAmount").value);
+          const occurred_on = $("txDate").value;
+          const category = $("txCategory").value;
+          const note = $("txNote").value.trim();
+          const cleared = $("txCleared").checked;
+
+          if (!Number.isFinite(amount))
+            return toast("Invalid amount", "warning");
+          if (!occurred_on) return toast("Pick a date", "warning");
+
+          const { error } = await sb.from("transactions").insert({
+            user_id,
+            account_id: ACCOUNT_ID,
+            occurred_on,
+            amount,
+            merchant: note || category,
+            note: note || null,
+            cleared,
+          });
+
+          if (error) throw error;
+
+          toast("Transaction saved", "success");
+          history.back();
+        } catch (e) {
+          console.error(e);
+          toast(e.message || "Failed to save transaction", "error");
+        }
+      }
+
+      // =========================
+      // Save Recurring
+      // =========================
+      async function saveRecurring() {
+        try {
+          const user_id = await requireUserId();
+
+          const name = $("recName").value.trim();
+          const amount = parseMoney($("recAmount").value);
+          const frequency = $("freq").value;
+          const start_date = $("recStartDate").value;
+          const expected = $("recExpected").checked;
+
+          if (!name) return toast("Name required", "warning");
+          if (!Number.isFinite(amount))
+            return toast("Invalid amount", "warning");
+          if (!start_date) return toast("Pick a start date", "warning");
+
+          let day_of_month = null;
+          if (frequency === "monthly") {
+            const dom = $("dom").value;
+            day_of_month = dom === "last" ? 0 : Number(dom);
+          }
+
+          const end_date = $("recEndDate").value || null;
+          const notes = $("recNotes").value.trim() || null;
+
+          const { error } = await sb.from("recurring_rules").insert({
+            user_id,
+            account_id: ACCOUNT_ID,
+            name,
+            amount,
+            frequency,
+            start_date,
+            end_date,
+            day_of_month,
+            expected,
+            notes,
+          });
+
+          if (error) throw error;
+
+          toast("Recurring item saved", "success");
+          history.back();
+        } catch (e) {
+          console.error(e);
+          toast(e.message || "Failed to save recurring", "error");
+        }
+      }
+
+      // =========================
+      // UI wiring
+      // =========================
+      document.addEventListener("DOMContentLoaded", () => {
+        ensureAuth();
+
+        $("btnLogin")?.addEventListener("click", handleLogin);
+        $("btnMagic")?.addEventListener("click", handleMagicLink);
+
+        // IMPORTANT: these must be on the SAVE buttons
+        $("btnSaveTx")?.addEventListener("click", saveTransaction);
+        $("btnSaveRec")?.addEventListener("click", saveRecurring);
+
+        // Tabs
+        document.querySelectorAll("[data-tab]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll("[data-tab]")
+              .forEach((b) => b.classList.remove("tab-active"));
+            btn.classList.add("tab-active");
+            $("panel-tx").classList.toggle("hidden", btn.dataset.tab !== "tx");
+            $("panel-rec").classList.toggle(
+              "hidden",
+              btn.dataset.tab !== "rec"
+            );
+          });
+        });
+
+        document.querySelectorAll("[data-rec-type]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-rec-type]").forEach((b) => {
+              // reset to outline
+              b.classList.remove("bg-ghostgreen", "text-white");
+              b.classList.add(
+                "btn-outline",
+                "border-ghostgreen",
+                "text-ghostgreen"
+              );
+            });
+
+            // set active to filled
+            btn.classList.remove("btn-outline", "text-ghostgreen");
+            btn.classList.add(
+              "bg-ghostgreen",
+              "text-white",
+              "border-ghostgreen"
+            );
+
+            $("recAmount").placeholder =
+              btn.dataset.recType === "income" ? "+1250.00" : "-1450.00";
+          });
+        });
+
+        // Monthly DOM enable
+        function syncDom() {
+          const isMonthly = $("freq").value === "monthly";
+          $("dom").disabled = !isMonthly;
+          $("dom").classList.toggle("opacity-60", !isMonthly);
+        }
+        $("freq").addEventListener("change", syncDom);
+        syncDom();
+
+        // Optional: respond to auth changes without reload
+        sb.auth.onAuthStateChange((_event, session) => {
+          session ? hideAuthModal() : showAuthModal();
+        });
+      });
+    </script>
+  </body>
+</html>
